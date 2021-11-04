@@ -33,7 +33,6 @@ public class RequestHandler implements Runnable {
                     body.append(line);
                 }
                 var receivedMessage = body.toString();
-                System.out.println("Inbound message: " + receivedMessage);
                 var data = resourceHandler.getResponseBody(receivedMessage);
                 outputStream.write(("HTTP/1.1 200 OK\n").getBytes());
                 outputStream.write(("\n").getBytes());
