@@ -2,6 +2,7 @@ package com.study;
 
 import com.study.exceptions.InternalServerErrorException;
 import com.study.exceptions.ResourceNotFoundException;
+import com.study.readers.ResourceReader;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -11,11 +12,11 @@ import java.net.Socket;
 
 public class RequestHandler implements Runnable {
     private final Socket socket;
-    private final ResourceHandler resourceHandler;
+    private final ResourceReader resourceReader;
 
-    public RequestHandler(Socket socket, ResourceHandler resourceHandler) {
+    public RequestHandler(Socket socket, ResourceReader resourceReader) {
         this.socket = socket;
-        this.resourceHandler = resourceHandler;
+        this.resourceReader = resourceReader;
     }
 
     @Override
@@ -33,7 +34,7 @@ public class RequestHandler implements Runnable {
                     body.append(line);
                 }
                 var receivedMessage = body.toString();
-                var data = resourceHandler.getResponseBody(receivedMessage);
+                var data = resourceReader.getResponseBody(receivedMessage);
                 outputStream.write(("HTTP/1.1 200 OK\n").getBytes());
                 outputStream.write(("\n").getBytes());
                 outputStream.write(data);
