@@ -1,5 +1,8 @@
 package com.study.readers;
 
+import com.study.models.Request;
+import com.study.models.Response;
+
 public interface ResourceReader {
-    byte[] getResponseBody(String requestBody);
+    Response getResponseBody(Request request);
 }

@@ -1,6 +1,9 @@
 package com.study.exceptions;
 
-public class InternalServerErrorException extends RuntimeException {
+public class InternalServerErrorException extends HttpExceptions {
+    public InternalServerErrorException() {
+    }
+
     public InternalServerErrorException(Throwable cause) {
         super(cause);
     }

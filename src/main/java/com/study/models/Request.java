@@ -1,5 +1,6 @@
-package com.study;
+package com.study.models;
 
+import com.study.enums.HttpMethod;
 import lombok.Data;
 
 import java.util.Map;

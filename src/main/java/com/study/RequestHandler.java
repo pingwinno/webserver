@@ -2,14 +2,15 @@ package com.study;
 
 import com.study.exceptions.InternalServerErrorException;
 import com.study.exceptions.ResourceNotFoundException;
+import com.study.processing.RequestParser;
+import com.study.processing.ResponseWriter;
 import com.study.readers.ResourceReader;
+import lombok.extern.slf4j.Slf4j;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.Socket;
 
+@Slf4j
 public class RequestHandler implements Runnable {
     private final Socket socket;
     private final ResourceReader resourceReader;
@@ -21,35 +22,26 @@ public class RequestHandler implements Runnable {
 
     @Override
     public void run() {
-        handleRequest(socket);
+        try {
+            handleRequest(socket);
+        } catch (IOException e) {
+            log.error("Error during sending response", e);
+            throw new InternalServerErrorException("Can't write response", e);
+        }
     }
 
-    private void handleRequest(Socket socket) {
-        try (socket; var outputStream = new BufferedOutputStream(socket.getOutputStream());
-             var reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-            try {
-                var body = new StringBuilder();
-                var line = "";
-                while (!(line = reader.readLine()).isEmpty()) {
-                    body.append(line);
-                }
-                var receivedMessage = body.toString();
-                var data = resourceReader.getResponseBody(receivedMessage);
-                outputStream.write(("HTTP/1.1 200 OK\n").getBytes());
-                outputStream.write(("\n").getBytes());
-                outputStream.write(data);
-                outputStream.flush();
-            } catch (ResourceNotFoundException e) {
-                outputStream.write(("HTTP/1.1 404 Not Found).getBytes()\n").getBytes());
-                outputStream.flush();
-                throw new ResourceNotFoundException(e);
-            } catch (InternalServerErrorException | IOException e) {
-                outputStream.write(("HTTP/1.1 500 Internal Server Error").getBytes());
-                outputStream.flush();
-                throw new InternalServerErrorException(e);
-            }
-        } catch (IOException e) {
+    private void handleRequest(Socket socket) throws IOException {
+        try {
+            var request = RequestParser.parse(socket.getInputStream());
+            ResponseWriter.writeResponse(request, resourceReader, socket.getOutputStream());
+        } catch (ResourceNotFoundException e) {
+            ResponseWriter.writeError(e, socket.getOutputStream());
+            throw new ResourceNotFoundException(e);
+        } catch (InternalServerErrorException e) {
+            ResponseWriter.writeError(e, socket.getOutputStream());
             throw new InternalServerErrorException(e);
+        } finally {
+            socket.close();
         }
     }
 }

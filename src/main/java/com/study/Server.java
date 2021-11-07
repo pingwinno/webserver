@@ -1,6 +1,7 @@
 package com.study;
 
-import com.study.readers.JavaResourceReader;
+import com.study.processing.RequestParser;
+import com.study.readers.FileResourceReader;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -11,9 +12,9 @@ public class Server {
     private final int port;
     private final String resourcePath;
 
-    public Server(int port, String resourceFolder) {
+    public Server(int port, String resourcePath) {
         this.port = port;
-        this.resourcePath = resourceFolder;
+        this.resourcePath = resourcePath;
     }
 
     public void start() throws IOException {
@@ -21,7 +22,7 @@ public class Server {
         try (var serverSocket = new ServerSocket(port)) {
             while (true) {
                 var socket = serverSocket.accept();
-                new Thread(new RequestHandler(socket, new JavaResourceReader(resourcePath) {
+                new Thread(new RequestHandler(socket, new FileResourceReader(resourcePath) {
                 })).start();
             }
         }

@@ -1,6 +1,8 @@
-package com.study;
+package com.study.processing;
 
+import com.study.enums.HttpMethod;
 import com.study.exceptions.InternalServerErrorException;
+import com.study.models.Request;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
@@ -19,10 +21,10 @@ public class RequestParser {
     private static final Pattern METHOD_AND_PATH = Pattern.compile("(\\p{Upper}+) (/.*) HTTP/1.1.*");
     private static final Pattern HEADER = Pattern.compile("^(.+): (.+)$");
 
-
-    public Request parse(InputStream inputStream) {
+    public static Request parse(InputStream inputStream) {
         var request = new Request();
-        try (var reader = new BufferedReader(new InputStreamReader(inputStream))) {
+        var reader = new BufferedReader(new InputStreamReader(inputStream));
+        try {
             List<String> requestMessage = new LinkedList<>();
             var line = "";
             while (Objects.nonNull(line = reader.readLine()) && !line.isEmpty()) {
@@ -32,12 +34,13 @@ public class RequestParser {
             injectHeaders(requestMessage, request);
 
         } catch (IOException e) {
+            log.error("Error during message handling", e);
             throw new InternalServerErrorException("Error during message handling", e);
         }
         return request;
     }
 
-    private void injectPathAndMethod(List<String> lines, Request request) {
+    private static void injectPathAndMethod(List<String> lines, Request request) {
         var methodAndHeader = lines.remove(0);
         var matcher = METHOD_AND_PATH.matcher(methodAndHeader);
         if (matcher.find()) {
@@ -53,7 +56,7 @@ public class RequestParser {
         throw new InternalServerErrorException("Can't parse HTTP method and/or path");
     }
 
-    private void injectHeaders(List<String> lines, Request request) {
+    private static void injectHeaders(List<String> lines, Request request) {
         if (lines.isEmpty()) {
             return;
         }

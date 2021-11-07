@@ -1,6 +1,9 @@
 package com.study;
 
+import com.study.enums.HttpMethod;
 import com.study.exceptions.InternalServerErrorException;
+import com.study.models.Request;
+import com.study.processing.RequestParser;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -38,7 +41,6 @@ class RequestParserTest {
 
     private static final String EXPECTED_PATH = "/home.html";
     private static final HttpMethod EXPECTED_GET_METHOD = HttpMethod.GET;
-    private RequestParser requestParser = new RequestParser();
 
     @Test
     void should_returnAllData_when_parseFullHttpGetMessage() {
@@ -46,7 +48,7 @@ class RequestParserTest {
         expectedRequest.setPath(EXPECTED_PATH);
         expectedRequest.setHttpMethod(EXPECTED_GET_METHOD);
         expectedRequest.setHeaders(HEADERS);
-        var actualRequest = requestParser.parse(
+        var actualRequest = RequestParser.parse(
                 new ByteArrayInputStream(FULL_GET_REQUEST.getBytes(StandardCharsets.UTF_8)));
         assertEquals(expectedRequest, actualRequest);
     }
@@ -56,7 +58,7 @@ class RequestParserTest {
         var expectedRequest = new Request();
         expectedRequest.setHttpMethod(HttpMethod.POST);
         expectedRequest.setPath("/");
-        var actualRequest = requestParser.parse(
+        var actualRequest = RequestParser.parse(
                 new ByteArrayInputStream("POST / HTTP/1.1\n".getBytes(StandardCharsets.UTF_8)));
         assertEquals(expectedRequest, actualRequest);
     }
@@ -66,20 +68,20 @@ class RequestParserTest {
         var expectedRequest = new Request();
         expectedRequest.setHttpMethod(HttpMethod.POST);
         expectedRequest.setPath("/home/user/folder/index.html");
-        var actualRequest = requestParser.parse(
+        var actualRequest = RequestParser.parse(
                 new ByteArrayInputStream("POST /home/user/folder/index.html HTTP/1.1\n".getBytes(StandardCharsets.UTF_8)));
         assertEquals(expectedRequest, actualRequest);
     }
 
     @Test
     void should_throwInternalServerErrorException_whenPathIsEmpty() {
-        assertThrows(InternalServerErrorException.class, () -> requestParser.parse(
+        assertThrows(InternalServerErrorException.class, () -> RequestParser.parse(
                 new ByteArrayInputStream("POST  HTTP/1.1\n".getBytes(StandardCharsets.UTF_8))));
     }
 
     @Test
     void should_throwInternalServerErrorException_whenMethodIsEmpty() {
-        assertThrows(InternalServerErrorException.class, () -> requestParser.parse(
+        assertThrows(InternalServerErrorException.class, () -> RequestParser.parse(
                 new ByteArrayInputStream("/ HTTP/1.1\n".getBytes(StandardCharsets.UTF_8))));
     }
 
