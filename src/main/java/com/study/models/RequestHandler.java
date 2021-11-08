@@ -1,4 +1,4 @@
-package com.study;
+package com.study.models;
 
 import com.study.exceptions.InternalServerErrorException;
 import com.study.exceptions.ResourceNotFoundException;

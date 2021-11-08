@@ -1,6 +1,6 @@
 package com.study;
 
-import com.study.processing.RequestParser;
+import com.study.models.RequestHandler;
 import com.study.readers.FileResourceReader;
 import lombok.extern.slf4j.Slf4j;
 
