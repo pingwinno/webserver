@@ -1,7 +1,7 @@
 package com.study.readers;
 
 import com.study.exceptions.InternalServerErrorException;
-import com.study.exceptions.ResourceNotFoundException;
+import com.study.exceptions.NotFoundException;
 import com.study.models.Request;
 import com.study.models.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URLConnection;
+import java.nio.file.Files;
 import java.util.LinkedHashMap;
 
 @Slf4j
@@ -30,9 +30,9 @@ public class FileResourceReader implements ResourceReader {
             var file = new File(resourceFolder + request.getPath());
             if (!file.exists()) {
                 log.warn("File with path: {} not found", file.getAbsolutePath());
-                throw new ResourceNotFoundException("File with path: " + file.getAbsolutePath() + " not found");
+                throw new NotFoundException("File with path: " + file.getAbsolutePath() + " not found");
             }
-            var mimeType = URLConnection.guessContentTypeFromName(file.getName());
+            var mimeType = Files.probeContentType(file.toPath());
             var contentLength = String.valueOf(file.length());
             var headers = new LinkedHashMap<String, String>();
             headers.put(CONTENT_TYPE, mimeType != null ? mimeType : DEFAULT_CONTENT_TYPE);
@@ -41,7 +41,7 @@ public class FileResourceReader implements ResourceReader {
 
         } catch (FileNotFoundException e) {
             log.warn("File not found with path: {}", request.getPath());
-            throw new ResourceNotFoundException("File not found ", e);
+            throw new NotFoundException("File not found ", e);
         } catch (IOException e) {
             log.error("Can't read file with path: {}", request.getPath());
             throw new InternalServerErrorException("Can't read file", e);

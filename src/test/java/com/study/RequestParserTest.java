@@ -1,6 +1,7 @@
 package com.study;
 
 import com.study.enums.HttpMethod;
+import com.study.exceptions.BadRequestException;
 import com.study.exceptions.InternalServerErrorException;
 import com.study.models.Request;
 import com.study.processing.RequestParser;
@@ -74,14 +75,14 @@ class RequestParserTest {
     }
 
     @Test
-    void should_throwInternalServerErrorException_whenPathIsEmpty() {
-        assertThrows(InternalServerErrorException.class, () -> RequestParser.parse(
+    void should_throwBadRequestException_whenPathIsEmpty() {
+        assertThrows(BadRequestException.class, () -> RequestParser.parse(
                 new ByteArrayInputStream("POST  HTTP/1.1\n".getBytes(StandardCharsets.UTF_8))));
     }
 
     @Test
-    void should_throwInternalServerErrorException_whenMethodIsEmpty() {
-        assertThrows(InternalServerErrorException.class, () -> RequestParser.parse(
+    void should_throwBadRequestException_whenMethodIsEmpty() {
+        assertThrows(BadRequestException.class, () -> RequestParser.parse(
                 new ByteArrayInputStream("/ HTTP/1.1\n".getBytes(StandardCharsets.UTF_8))));
     }
 

@@ -1,6 +1,7 @@
 package com.study.processing;
 
 import com.study.enums.HttpMethod;
+import com.study.exceptions.BadRequestException;
 import com.study.exceptions.InternalServerErrorException;
 import com.study.models.Request;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +54,7 @@ public class RequestParser {
             }
         }
         log.error("Can't parse HTTP method and/or path from: {}", methodAndHeader);
-        throw new InternalServerErrorException("Can't parse HTTP method and/or path");
+        throw new BadRequestException("Can't parse HTTP method and/or path");
     }
 
     private static void injectHeaders(List<String> lines, Request request) {

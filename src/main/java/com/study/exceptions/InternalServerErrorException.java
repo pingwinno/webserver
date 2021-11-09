@@ -1,6 +1,6 @@
 package com.study.exceptions;
 
-public class InternalServerErrorException extends HttpExceptions {
+public class InternalServerErrorException extends HttpException {
     public InternalServerErrorException() {
     }
 

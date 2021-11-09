@@ -1,6 +1,6 @@
 package com.study.readers;
 
-import com.study.exceptions.ResourceNotFoundException;
+import com.study.exceptions.NotFoundException;
 import com.study.models.Request;
 import org.junit.jupiter.api.Test;
 
@@ -35,11 +35,11 @@ class FileResourceReaderTest {
     void should_throwResourceNotFoundException_when_passRequestObjectWithWrongFilePath() {
         var request = new Request();
         request.setPath("/webapp/somenonexistingfile.txt");
-        assertThrows(ResourceNotFoundException.class, () -> reader.getResponseBody(request));
+        assertThrows(NotFoundException.class, () -> reader.getResponseBody(request));
     }
     @Test
     void should_throwResourceNotFoundException_when_passRequestObjectWithNullFilePath() {
         var request = new Request();
-        assertThrows(ResourceNotFoundException.class, () -> reader.getResponseBody(request));
+        assertThrows(NotFoundException.class, () -> reader.getResponseBody(request));
     }
 }
