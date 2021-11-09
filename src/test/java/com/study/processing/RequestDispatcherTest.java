@@ -29,6 +29,16 @@ class RequestDispatcherTest {
     }
 
     @Test
+    void should_returnStaticContentHandler_whenPassValidPathWithWildcard() {
+        RequestDispatcher dispatcher =
+                new RequestDispatcher(new LinkedHashMap<>(Map.of(Pattern.compile("/path/*."), EXPECTED_HANDLER)));
+        var request = new Request();
+        request.setPath("/path/morepath/evenmorepath");
+        var actualHandler = dispatcher.getHandler(request);
+        assertEquals(EXPECTED_HANDLER, actualHandler);
+    }
+
+    @Test
     void should_throwNotFoundException_whenPassInvalidPath() {
         var request = new Request();
         request.setPath("/someOtherPath");
